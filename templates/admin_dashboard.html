@@ -1,0 +1,28 @@
+<!-- link layout.html -->
+{% extends "layout.html" %}
+
+<!-- give name to a title-->
+{% block title %}
+Dashboard
+{% endblock %}
+
+<!-- link adminNavbar.html-->
+{% block navbar %}
+{% include "adminNavbar.html" %}
+{% endblock %}
+
+<!-- add a content to the body block-->
+{% block content %}
+
+<h2>Welcome {{ username }}</h2>
+
+<div class="card-container">
+
+<div class="card">
+<h4>Portfolio Value</h4>
+<p>$2000</p>
+</div>
+
+</div>
+
+{% endblock %}

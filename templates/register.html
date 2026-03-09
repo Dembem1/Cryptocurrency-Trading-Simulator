@@ -1,0 +1,29 @@
+<!-- link layout.html -->
+{% extends "layout.html" %}
+
+<!-- give name to a title-->
+{% block title %}
+Register
+{% endblock %}
+
+<!-- add a content to the body block-->
+{% block content %}
+
+<div class="auth-container">
+
+  <h2>Create Account</h2>
+
+  <form method="POST" action="{{ url_for('register') }}">
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button class="btn btn-success">Register</button>
+  </form>
+
+  <p>
+  Already have an account?
+  <a href="{{ url_for('index') }}">Login</a>
+  </p>
+
+</div>
+
+{% endblock %}

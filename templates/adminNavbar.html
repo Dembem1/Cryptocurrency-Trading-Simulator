@@ -1,0 +1,40 @@
+<!-- admin side bar with Dashboard, Manage Users, Manage Coins and System Logs-->
+<div class="sidebar">
+
+    <h4 class="logo">CryptoSim</h4>
+
+    <ul>
+
+        <li>
+            <a href="{{ url_for('admin_dashboard', username=username) }}">
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('manage_users', username=username) }}">
+                Manage Users
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('manage_coins', username=username) }}">
+                Manage Coins
+            </a>
+        </li>
+        
+        <li>
+            <a href="{{ url_for('logs', username=username) }}">
+                System Logs
+            </a>
+        </li>
+        
+        <li>
+            <a href="{{ url_for('index') }}">
+                Logout
+            </a>
+        </li>
+
+    </ul>
+
+</div>
