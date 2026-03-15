@@ -1,28 +1,51 @@
 <!-- link layout.html -->
 {% extends "layout.html" %}
 
+<!-- pass title for topbar navigation -->
+{% set title = "Dashboard" %}
+
 <!-- give name to a title-->
 {% block title %}
 Dashboard
 {% endblock %}
 
-<!-- link userNavbar.html-->
-{% block navbar %}
-{% include "userNavbar.html" %}
-{% endblock %}
-
 <!-- add a content to the body block-->
 {% block content %}
+<div class="container-fluid">
 
-<h2>Welcome {{ username }}</h2>
+    <h2 class="mb-4">Trending Coins</h2>
 
-<div class="card-container">
+    <!-- chart placeholder -->
+    <div class="card mb-4">
 
-<div class="card">
-<h4>Portfolio Value</h4>
-<p>$2000</p>
+        <div class="card-body text-center">
+
+            <p>Trending coins chart will appear here.</p>
+
+            <canvas id="trendingChart" height="120"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- buy button -->
+    <div class="text-start">
+
+        <a href="{{ url_for('transactions', username=current_user) }}" 
+        class="btn btn-primary">
+
+        Buy Coin
+
+        </a>
+
+    </div>
+
 </div>
+{% endblock %}
 
-</div>
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
 {% endblock %}

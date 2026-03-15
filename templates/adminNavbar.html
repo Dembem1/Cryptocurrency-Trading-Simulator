@@ -1,9 +1,10 @@
+<!-- sidebar section -->
 <!-- admin side bar with Dashboard, Manage Users, Manage Coins and System Logs-->
-<div class="sidebar">
+<nav class="sidebar">
 
-    <h4 class="logo">CryptoSim</h4>
+    <h4 class="logo">Logo</h4>
 
-    <ul>
+    <ul class="nav-list">
 
         <li>
             <a href="{{ url_for('admin_dashboard', username=username) }}">
@@ -30,11 +31,42 @@
         </li>
         
         <li>
-            <a href="{{ url_for('index') }}">
+            <a href="{{ url_for('index') }}" class="logout">
                 Logout
             </a>
         </li>
 
     </ul>
 
-</div>
+</nav>
+
+<!-- topbar section -->
+<nav class="topbar">
+
+    <span class="page_title">
+        {{ title }}
+    </span> <!-- pass a title from a page -->
+
+    <div class="topbar-right">
+
+        <span class="balance">
+            Balance: ${{ balance }}
+        </span>
+
+        <span class="username">
+            {{ username }}
+        </span>
+
+    </div>
+
+</nav>
+
+<!-- theme bar section -->
+<nav class="theme-bar">
+
+<button id="themeToggle" class="btn btn-outline-secondary btn-sm">
+
+Dark Mode
+
+</button>
+</nav>

@@ -1,0 +1,31 @@
+<!-- link layout.html -->
+{% extends "layout.html" %}
+
+<!-- pass title for topbar navigation -->
+{% set title = "Portfolio" %}
+
+<!-- give name to a title-->
+{% block title %}
+Portfolio
+{% endblock %}
+
+<!-- add a content to the body block-->
+{% block content %}
+<div class="container-fluid">
+
+    <h2 class="mb-4">Portfolio</h2>
+
+    {% if view == "summary" %}
+        {% include "components/portfolio_summary.html" %}
+    {% endif %}
+
+    {% if view == "performance" %}
+        {% include "components/portfolio_performance.html" %}
+    {% endif %}
+
+    {% if view == "holdings" %}
+        {% include "components/portfolio_holdings.html" %}
+    {% endif %}
+
+</div>
+{% endblock %}

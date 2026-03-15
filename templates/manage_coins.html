@@ -1,0 +1,50 @@
+<!-- link layout.html -->
+{% extends "layout.html" %}
+
+<!-- pass title for topbar navigation -->
+{% set title = "Manage coins" %}
+
+<!-- give name to a title-->
+{% block title %}
+Manage coins
+{% endblock %}
+
+<!-- add a content to the body block-->
+{% block content %}
+<div class="container-fluid">
+
+<h2 class="mb-4">Manage Coins</h2>
+
+<!-- selected coin info + add button -->
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<div>
+
+<strong>Selected Coin:</strong> None
+
+</div>
+
+<button class="btn btn-primary">
+
+Add Coin
+
+</button>
+
+</div>
+
+
+{% set headers = [
+"Coin Symbol",
+"Price",
+"Action"
+] %}
+
+{% set rows = [] %}
+
+{% set empty_message = "No coins added to the system yet." %}
+
+{% include "components/table_component.html" %}
+
+</div>
+{% endblock %}
