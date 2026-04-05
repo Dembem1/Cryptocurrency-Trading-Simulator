@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="mb-3">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if view == 'summary' %}active{% endif %}" href="{{ url_for('portfolio', username=current_user, view='summary') }}">Summary</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if view == 'performance' %}active{% endif %}" href="{{ url_for('portfolio', username=current_user, view='performance') }}">Performance View</a>
+        </li>
+    </ul>
+</div>
+
+{% if view == 'summary' %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center p-4 mb-3">
+            <h6>ROI %</h6>
+            <h2 class="text-success">+5.80%</h2>
+        </div>
+    </div>
+    </div>
+
+{% elif view == 'performance' %}
+<div class="card shadow-sm p-4">
+    <h5>Profit/Loss Chart</h5>
+    <canvas id="performanceChart" height="100"></canvas>
+</div>
+
+<script>
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+            datasets: [{
+                label: 'Portfolio Value',
+                data: [1000, 1050, 1020, 1100, 1150],
+                borderColor: '#0d6efd',
+                tension: 0.1
+            }]
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

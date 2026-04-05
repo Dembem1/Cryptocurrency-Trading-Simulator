@@ -1,0 +1,122 @@
+/* General Body */
+body {
+    background-color: #111827;
+    color: #e5e7eb;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Layout Structure */
+.sidebar {
+    height: 100vh;
+    background-color: #1f2937; /* sidebar */
+    border-right: 1px solid #374151;
+    position: fixed;
+    width: 250px;
+    z-index: 1000;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+/* Navigation and Sidebar */
+.nav-link {
+    color: #9ca3af !important;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+
+.nav-link:hover {
+    color: #fbbf24 !important; /* hover effect  */
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+/* Cards and Visual Hierarchy */
+.card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    color: #e5e7eb;
+}
+
+.card-hover {
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.card-hover:hover {
+    border-color: #6366f1 !important;
+    transform: translateY(-4px); /* lift effect */
+}
+
+/* Forms and Input Visibility */
+.form-control {
+    background-color: #111827 !important;
+    border: 1px solid #374151;
+    color: #ffffff !important;
+    padding: 0.75rem;
+}
+
+.form-control:focus {
+    background-color: #111827;
+    color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+}
+
+.form-control::placeholder {
+    color: #6b7280;
+}
+
+/* Autofill on dark theme */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #111827 inset;
+    -webkit-text-fill-color: #ffffff;
+    caret-color: #ffffff;
+}
+
+/* Tables and Data Clarity */
+.table {
+    color: #e5e7eb;
+    border-color: #374151;
+}
+
+.table-dark {
+    --bs-table-bg: #1f2937;
+    --bs-table-border-color: #374151;
+}
+
+/* Financial Indicators */
+.text-success { color: #10b981 !important; } /* profit/ROI */
+.text-danger { color: #ef4444 !important; }  /* loss */
+.badge { font-weight: 600; padding: 0.5em 0.8em; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #111827;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+}
