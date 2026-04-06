@@ -1,4 +1,4 @@
-/* General Body */
+/* General body */
 body {
     background-color: #111827;
     color: #e5e7eb;
@@ -7,7 +7,7 @@ body {
     margin: 0;
 }
 
-/* Layout Structure */
+/* Layout structure */
 .sidebar {
     height: 100vh;
     background-color: #1f2937; /* sidebar */
@@ -98,7 +98,7 @@ input:-webkit-autofill:focus {
     --bs-table-border-color: #374151;
 }
 
-/* Financial Indicators */
+/* Financial indicators */
 .text-success { color: #10b981 !important; } /* profit/ROI */
 .text-danger { color: #ef4444 !important; }  /* loss */
 .badge { font-weight: 600; padding: 0.5em 0.8em; }
@@ -120,3 +120,52 @@ input:-webkit-autofill:focus {
 ::-webkit-scrollbar-thumb:hover {
     background: #4b5563;
 }
+
+/* Theme variables */
+:root {
+    --text-light: #f8f9fa;
+    --text-white: #ffffff;
+    --text-muted-light: #adb5bd;
+    --text-dark: #1a1a1a;
+    --text-muted-dark: #4b5563;
+    --bg-white: #ffffff;
+}
+
+/* General light text theme */
+.card-body, .card-title, .card-text, 
+.list-group-item, .nav-link,
+label, .form-label, .input-group-text {
+    color: var(--text-light) !important;
+}
+
+.text-muted, .small, span.text-secondary {
+    color: var(--text-muted-light) !important;
+}
+
+/* Light background contexts */
+.table, 
+.table :is(td, th, thead th, tbody tr td) {
+    background-color: var(--bg-white) !important;
+    color: var(--text-dark) !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Specific overrides for bold text and titles within light containers */
+.table :is(h5, h6, b, strong),
+.bg-light h5,
+.bg-white h5,
+.coin-name,
+.coin-symbol {
+    color: var(--text-dark) !important;
+}
+
+/* improving readability for muted text on light backgrounds */
+.table .text-muted {
+    color: var(--text-muted-dark) !important;
+}
+
+/* Safety patch */
+.alert, .alert-heading, .alert p {
+    color: #0f172a !important;
+}
+
