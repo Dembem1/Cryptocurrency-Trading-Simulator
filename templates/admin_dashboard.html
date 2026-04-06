@@ -1,0 +1,39 @@
+<!-- link layout.html -->
+{% extends "layout.html" %}
+
+<!-- pass title for topbar navigation -->
+{% set title = "Admin Dashboard" %}
+
+<!-- give name to a title-->
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+<!-- add a content to the body block-->
+{% block content %}
+<div class="container-fluid">
+
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row">
+            
+        {% set label = "Total Users" %}
+        {% set value = "0" %}
+        {% include "components/stat_card.html" %}
+
+        {% set label = "Total Trading Volume" %}
+        {% set value = "$0" %}
+        {% include "components/stat_card.html" %}
+
+        {% set label = "Most Traded Coin" %}
+        {% set value = "None" %}
+        {% include "components/stat_card.html" %}
+
+        {% set label = "Total Transactions" %}
+        {% set value = "0" %}
+        {% include "components/stat_card.html" %}
+        
+    </div>
+
+</div>
+{% endblock %}
