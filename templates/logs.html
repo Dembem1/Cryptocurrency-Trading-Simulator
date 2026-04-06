@@ -1,50 +1,18 @@
-<!-- link layout.html -->
 {% extends "layout.html" %}
-
-<!-- pass title for topbar navigation -->
-{% set title = "System logs" %}
-
-<!-- give name to a title-->
-{% block title %}
-Logs
-{% endblock %}
-
-<!-- add a content to the body block-->
 {% block content %}
-<div class="container-fluid">
-
-<h2 class="mb-4">System Logs</h2>
-
-<!-- search bar -->
-
 <div class="mb-3">
-
-<input
-type="text"
-class="form-control"
-placeholder="Search logs..."
-id="logSearch">
-
+    <input type="text" class="form-control" placeholder="Search logs...">
 </div>
-
-
-{% set headers = [
-"Timestamp",
-"User",
-"Action",
-"Description"
-] %}
-
-{% set rows = [] %}
-
-{% set empty_message = "No system logs available." %}
-
-{% include "components/table_component.html" %}
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead class="table-light">
+                <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>2026-02-10 14:30</td><td>admin</td><td>LOGIN</td><td>Admin session started</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-
-<script src="{{ url_for('static', filename='js/log_search.js') }}"></script>
-
 {% endblock %}

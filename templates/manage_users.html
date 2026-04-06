@@ -1,44 +1,21 @@
-<!-- link layout.html -->
 {% extends "layout.html" %}
-
-<!-- pass title for topbar navigation -->
-{% set title = "Manage users" %}
-
-<!-- give name to a title-->
-{% block title %}
-Manage users
-{% endblock %}
-
-<!-- add a content to the body block-->
 {% block content %}
-
-<div class="container-fluid">
-
-    <h2 class="mb-4">Manage Users</h2>
-
-    <!-- search bar -->
-
-    <div class="mb-3">
-
-    <input 
-    type="text" 
-    class="form-control" 
-    placeholder="Search user..."
-    id="searchUser">
-
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td><td>oleksii</td><td>oleksii@test.com</td><td>User</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td><button class="btn btn-sm btn-outline-danger">Ban</button></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-    {% set headers = ["ID", "Username", "Email", "Role", "Status", "Action"] %}
-
-    {% set rows = [] %}
-
-    {% include "components/table_component.html" %}
-
 </div>
-{% endblock %}
-
-{% block scripts %}
-
-<script src="{{ url_for('static', filename='js/manage_users.js') }}"></script>
-
 {% endblock %}

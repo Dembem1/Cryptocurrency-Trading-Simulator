@@ -1,51 +1,39 @@
-<!-- link layout.html -->
 {% extends "layout.html" %}
 
-<!-- pass title for topbar navigation -->
-{% set title = "Dashboard" %}
-
-<!-- give name to a title-->
-{% block title %}
-Dashboard
-{% endblock %}
-
-<!-- add a content to the body block-->
 {% block content %}
-<div class="container-fluid">
-
-    <h2 class="mb-4">Trending Coins</h2>
-
-    <!-- chart placeholder -->
-    <div class="card mb-4">
-
-        <div class="card-body text-center">
-
-            <p>Trending coins chart will appear here.</p>
-
-            <canvas id="trendingChart" height="120"></canvas>
-
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Market Overview</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Coin</th>
+                            <th>Symbol</th>
+                            <th>Current Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bitcoin</td>
+                            <td>BTC</td>
+                            <td>£50,000.00</td>
+                            <td><button class="btn btn-sm btn-outline-primary">Trade</button></td>
+                        </tr>
+                        <tr>
+                            <td>Ethereum</td>
+                            <td>ETH</td>
+                            <td>£2,500.00</td>
+                            <td><button class="btn btn-sm btn-outline-primary">Trade</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
-
-
-    <!-- buy button -->
-    <div class="text-start">
-
-        <a href="{{ url_for('transactions', username=username) }}" 
-        class="btn btn-primary">
-
-        Buy Coin
-
-        </a>
-
-    </div>
-
 </div>
-{% endblock %}
-
-{% block scripts %}
-
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-
 {% endblock %}

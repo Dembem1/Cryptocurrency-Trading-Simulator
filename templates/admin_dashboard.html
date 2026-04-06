@@ -1,39 +1,57 @@
-<!-- link layout.html -->
 {% extends "layout.html" %}
 
-<!-- pass title for topbar navigation -->
-{% set title = "Admin Dashboard" %}
-
-<!-- give name to a title-->
-{% block title %}
-Admin Dashboard
-{% endblock %}
-
-<!-- add a content to the body block-->
 {% block content %}
-<div class="container-fluid">
+  <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0">Platform Overview</h4>
+          <span class="text-muted small">Real-time system monitoring</span>
+      </div>
 
-    <h2 class="mb-4">Admin Dashboard</h2>
+      <div class="row g-4">
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Total Users</h6>
+                  <h2 class="fw-bold mb-0">124</h2>
+                  <div class="mt-2 small text-success">↑ 4% this week</div>
+              </div>
+          </div>
 
-    <div class="row">
-            
-        {% set label = "Total Users" %}
-        {% set value = "0" %}
-        {% include "components/stat_card.html" %}
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Total Trading Volume</h6>
+                  <h2 class="fw-bold mb-0">£45,200</h2>
+                  <div class="mt-2 small text-muted">Simulated Activity</div>
+              </div>
+          </div>
 
-        {% set label = "Total Trading Volume" %}
-        {% set value = "$0" %}
-        {% include "components/stat_card.html" %}
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Most Traded Coin</h6>
+                  <h2 class="fw-bold text-primary mb-0">BTC</h2>
+                  <div class="mt-2 small text-muted">Based on 24h logs</div>
+              </div>
+          </div>
 
-        {% set label = "Most Traded Coin" %}
-        {% set value = "None" %}
-        {% include "components/stat_card.html" %}
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Total Transactions</h6>
+                  <h2 class="fw-bold mb-0">842</h2>
+                  <div class="mt-2 small text-info">All system logs</div>
+              </div>
+          </div>
+      </div>
 
-        {% set label = "Total Transactions" %}
-        {% set value = "0" %}
-        {% include "components/stat_card.html" %}
-        
-    </div>
-
-</div>
+      <div class="row mt-5">
+          <div class="col-md-12">
+              <div class="card p-4 border-0 shadow-sm" style="background-color: rgba(255,255,255,0.03);">
+                  <h5>Administrative Quick Links</h5>
+                  <p class="text-muted">Use the sidebar or the links below to manage the platform.</p>
+                  <div class="d-flex gap-3">
+                      <a href="{{ url_for('manage_users', username=current_user) }}" class="btn btn-outline-primary btn-sm">Review User Status</a>
+                      <a href="{{ url_for('manage_coins', username=current_user) }}" class="btn btn-outline-info btn-sm">Add New Coin</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
 {% endblock %}

@@ -1,31 +1,80 @@
-<!-- link layout.html -->
 {% extends "layout.html" %}
 
-<!-- pass title for topbar navigation -->
-{% set title = "Portfolio" %}
-
-<!-- give name to a title-->
-{% block title %}
-Portfolio
-{% endblock %}
-
-<!-- add a content to the body block-->
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div class="container-fluid">
+    <h2 class="text-white mb-4">Portfolio Analysis</h2>
+    
+    <ul class="nav nav-tabs mb-4 border-secondary">
+        <li class="nav-item">
+            <a class="nav-link {% if view == 'summary' %}active{% endif %}" 
+               href="{{ url_for('portfolio', username=current_user, view='summary') }}">Summary</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if view == 'performance' %}active{% endif %}" 
+               href="{{ url_for('portfolio', username=current_user, view='performance') }}">Performance View</a>
+        </li>
+    </ul>
 
-    <h2 class="mb-4">Portfolio</h2>
+    {% if view == 'summary' %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card p-4 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">Current ROI %</h6>
+                <h2 class="text-success mt-2">+5.80%</h2>
+            </div>
+        </div>
+    </div>
 
-    {% if view == "summary" %}
-        {% include "components/portfolio_summary.html" %}
+    {% elif view == 'performance' %}
+    <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="m-0">Profit/Loss Performance</h5>
+            <span class="badge bg-primary">7-Day View</span>
+        </div>
+        
+        <div style="height: 350px; width: 100%;">
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js setup
+        var ctx = document.getElementById('performanceChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Portfolio Value ($)',
+                    data: [1000, 1050, 1020, 1100, 1150, 1210, 1250],
+                    borderColor: '#0d6efd', // blue
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.2 // for the curved line on chart
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } // to keep it clean
+                },
+                scales: {
+                    y: { 
+                        grid: { color: '#374151' }, 
+                        ticks: { color: '#9ca3af' } 
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af' }
+                    }
+                }
+            }
+        });
+    </script>
     {% endif %}
-
-    {% if view == "performance" %}
-        {% include "components/portfolio_performance.html" %}
-    {% endif %}
-
-    {% if view == "holdings" %}
-        {% include "components/portfolio_holdings.html" %}
-    {% endif %}
-
 </div>
 {% endblock %}
