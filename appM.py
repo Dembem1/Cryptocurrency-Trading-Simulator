@@ -182,6 +182,7 @@ def admin_dashboard(username):
         "admin_dashboard.html",
         username=user.username,
         balance=user.balance,
+        role=user.role,
         totalUsers = totalUsers,
         title="Admin Dashboard"
     )
@@ -213,6 +214,7 @@ def manage_users(username):
         "manage_users.html",
         username=user.username,
         balance=user.balance,
+        role=user.role,
         users=users,
         title="Manage Users"
     )
@@ -230,6 +232,7 @@ def manage_coins(username):
         "manage_coins.html",
         username=user.username,
         balance=user.balance,
+        role=user.role,
         title="Manage Coins"
     )
 
@@ -247,6 +250,7 @@ def logs(username):
         "logs.html",
         username=user.username,
         balance=user.balance,
+        role=user.role,
         title="System Logs"
     )
 
