@@ -9,11 +9,34 @@
                 </tr>
             </thead>
             <tbody>
+                {% for user in users %}
                 <tr>
-                    <td>1</td><td>oleksii</td><td>oleksii@test.com</td><td>User</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td><button class="btn btn-sm btn-outline-danger">Ban</button></td>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                    {% if user.is_banned == True %}
+                        <span class="badge bg-danger">Banned</span>
+                    {% else %}
+                        <span class="badge bg-success">Active</span>
+                    {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_banned == True %}
+                        <form method="post">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button class="btn btn-sm btn-outline-danger" name="action" value="unban">Unban</button>
+                        </form>
+                        {% else %}
+                        <form method="post">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button class="btn btn-sm btn-outline-danger" name="action" value="ban">Ban</button>
+                        </form>
+                        {% endif %}
+                    </td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
