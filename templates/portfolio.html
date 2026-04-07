@@ -9,11 +9,11 @@
     <ul class="nav nav-tabs mb-4 border-secondary">
         <li class="nav-item">
             <a class="nav-link {% if view == 'summary' %}active{% endif %}" 
-               href="{{ url_for('portfolio', username=current_user, view='summary') }}">Summary</a>
+               href="{{ url_for('portfolio', username=username, view='summary') }}">Summary</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if view == 'performance' %}active{% endif %}" 
-               href="{{ url_for('portfolio', username=current_user, view='performance') }}">Performance View</a>
+               href="{{ url_for('portfolio', username=username, view='performance') }}">Performance View</a>
         </li>
     </ul>
 
