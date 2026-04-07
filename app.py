@@ -213,17 +213,31 @@ def admin_dashboard(username):
     )
 
 
-@app.route("/manage_users/<username>")
+@app.route( "/manage_users/<username>", methods=["GET", "POST"])
 def manage_users(username):
     user = User.query.filter_by(username=username).first()
+    users = User.query.all()
 
     if not user:
         return "User not found!"
+
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        user_to_ban = User.query.get(user_id)
+        user_to_unban = User.query.get(user_id)
+
+        if user_to_ban:
+            user_to_ban.role = 'banned'
+            db.session.commit()
+        elif user_to_unban:
+            user_to_unban.role = 'user'
+            db.session.commit()
 
     return render_template(
         "manage_users.html",
         username=user.username,
         balance=user.balance,
+        users=users,
         title="Manage Users"
     )
 
