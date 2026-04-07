@@ -35,26 +35,26 @@
         <ul class="nav nav-pills flex-column mb-auto">
             {% if role == 'admin' %}
                 <li class="nav-item">
-                    <a href="{{ url_for('admin_dashboard', username=current_user) }}" class="nav-link {% if title == 'Admin Dashboard' %}active{% endif %}">Admin Home</a>
+                    <a href="{{ url_for('admin_dashboard', username=username) }}" class="nav-link {% if title == 'Admin Dashboard' %}active{% endif %}">Admin Home</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('manage_users', username=current_user) }}" class="nav-link {% if title == 'Manage Users' %}active{% endif %}">User Management</a>
+                    <a href="{{ url_for('manage_users', username=username) }}" class="nav-link {% if title == 'Manage Users' %}active{% endif %}">User Management</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('manage_coins', username=current_user) }}" class="nav-link {% if title == 'Manage Coins' %}active{% endif %}">Coin Management</a>
+                    <a href="{{ url_for('manage_coins', username=username) }}" class="nav-link {% if title == 'Manage Coins' %}active{% endif %}">Coin Management</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('logs', username=current_user) }}" class="nav-link {% if title == 'System Logs' %}active{% endif %}">System Logs</a>
+                    <a href="{{ url_for('logs', username=username) }}" class="nav-link {% if title == 'System Logs' %}active{% endif %}">System Logs</a>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a href="{{ url_for('dashboard', username=current_user) }}" class="nav-link {% if page_title == 'Dashboard' %}active{% endif %}">Dashboard</a>
+                    <a href="{{ url_for('dashboard', username=username) }}" class="nav-link {% if page_title == 'Dashboard' %}active{% endif %}">Dashboard</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('portfolio', username=current_user) }}" class="nav-link {% if page_category == 'portfolio' %}active{% endif %}">Portfolio</a>
+                    <a href="{{ url_for('portfolio', username=username) }}" class="nav-link {% if page_category == 'portfolio' %}active{% endif %}">Portfolio</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('transactions', username=current_user) }}" class="nav-link {% if page_title == 'Transactions' %}active{% endif %}">Transactions</a>
+                    <a href="{{ url_for('transactions', username=username) }}" class="nav-link {% if page_title == 'Transactions' %}active{% endif %}">Transactions</a>
                 </li>
             {% endif %}
         </ul>

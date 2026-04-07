@@ -168,7 +168,7 @@ def dashboard(username):
     if not user:
         flash("User not found!")
 
-    return render_template("dashboard.html", username=user.username, balance=user.balance, page_title="Dashboard")
+    return render_template("dashboard.html", username=user.username, balance=user.balance, role=user.role, page_title="Dashboard")
 
 
 @app.route("/portfolio/<username>")
@@ -180,7 +180,7 @@ def portfolio(username):
     if not user:
         flash("User not found!")
 
-    return render_template("portfolio.html", username=user.username, balance=user.balance, page_category="portfolio", view=view)
+    return render_template("portfolio.html", username=user.username, balance=user.balance, role=user.role, view=view, page_category="portfolio")
 
 
 @app.route("/transactions/<username>")
@@ -190,7 +190,7 @@ def transactions(username):
     if not user:
         flash("User not found!")
 
-    return render_template("transactions.html", username=user.username, balance=user.balance, page_title="Transactions")
+    return render_template("transactions.html", username=user.username, balance=user.balance, role=user.role, page_title="Transactions")
 
 
 # admin routes
@@ -202,10 +202,13 @@ def admin_dashboard(username):
     if not user:
         return "User not found!"
 
+    totalUsers = User.query.count()
+
     return render_template(
         "admin_dashboard.html",
         username=user.username,
         balance=user.balance,
+        totalUsers = totalUsers,
         title="Admin Dashboard"
     )
 
