@@ -2,18 +2,31 @@
 {% block content %}
 <div class="card shadow-sm mb-4">
     <div class="card-body">
-        <form class="row g-3">
-            <div class="col-auto"><input type="text" class="form-control" placeholder="Enter Coin Symbol (e.g. btc)"></div>
-            <div class="col-auto"><button type="submit" class="btn btn-primary">Add Coin</button></div>
+        <form method="POST" class="row g-3">
+            <div class="col-auto">
+                <input type="text" name="coin_name" class="form-control" placeholder="Enter Coin Name (e.g. bitcoin)">
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="action" value="add" class="btn btn-primary">Add Coin</button>
+            </div>
+            <div class="col-auto">
+                <button type="submit" name="action" value="delete" class="btn btn-primary">Delete Coin</button>
+            </div>
         </form>
     </div>
 </div>
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h6>Supported Coins</h6>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center">Bitcoin (BTC) <button class="btn btn-sm text-danger">Remove</button></li>
-        </ul>
+<h1>Live Crypto Prices</h1>
+    <div>
+        {% for coin, details in prices.items() %}
+        <div class="crypto-card">
+            <span style="text-transform: capitalize;"><strong>{{ coin }}</strong></span>
+            <span>
+                <span class="price">${{ "{:,.2f}".format(details['usd']) }}</span>
+                <span class="change {{ 'positive' if details.usd_24h_change > 0 else 'negative' }}">
+                    ({{ "%.2f"|format(details.usd_24h_change) }}%)
+                </span>
+            </span>
+        </div>
+        {% endfor %}
     </div>
-</div>
 {% endblock %}
