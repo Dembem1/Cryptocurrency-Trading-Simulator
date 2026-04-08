@@ -30,3 +30,24 @@ body.dark-mode .main-content{
 background:#121212;
 
 }
+
+/* If we are on the login or register page hide the navigation elements */
+body:has(.auth-card), /* if you add an auth-card class */
+body:has(form[action="/login"]), 
+body:has(form[action="/register"]) {
+    background-color: #0f172a; 
+}
+
+/* Hide Sidebar and Topbar on auth pages */
+body:has(form[action="/login"]) .sidebar,
+body:has(form[action="/register"]) .sidebar,
+body:has(form[action="/login"]) .topbar,
+body:has(form[action="/register"]) .topbar {
+    display: none !important;
+}
+
+body:has(form[action="/login"]) .main-content,
+body:has(form[action="/register"]) .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+}

@@ -55,6 +55,20 @@ class Transaction(db.Model):
     total = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+class Log(db.Model):
+    __tablename__ = 'logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    action = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255))
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+def log_action(username, action, description):
+    new_log = Log(username=username, action=action, description=description)
+    db.session.add(new_log)
+    db.session.commit()
+
 # --------- PUBLIC ROUTE ----------
 
 @app.route("/")
@@ -89,6 +103,7 @@ def login():
         return redirect(url_for("index"))
 
     flash("Login successful!", "success")
+    log_action(username, "login", "User logged in successfully.")
 
     if user.role == "admin":
         return redirect(url_for("admin_dashboard", username=username))
@@ -129,6 +144,8 @@ def register():
                 print(e)
 
         flash("Registration successful. Please login.", "success")
+        log_action(username, "register", "User registered successfully.")
+
         return redirect(url_for("index"))
 
     return render_template("register.html")
@@ -190,67 +207,40 @@ def dashboard(username):
 
         price = price_data[coin_name]["usd"]
         total_cost = price * amount
+        
+        if user.balance < total_cost:
+            flash("Not enough balance!", "warning")
+            return redirect(url_for("dashboard", username=username))
 
         # buy logic
-        if action == "buy":
+        user.balance -= total_cost
 
-            if user.balance < total_cost:
-                flash("Not enough balance!", "warning")
-                return redirect(url_for("dashboard", username=username))
+        wallet_item = Wallet.query.filter_by(
+            userId=user.id,
+            coinName=coin_name
+        ).first()
 
-            user.balance -= total_cost
-
-            wallet_item = Wallet.query.filter_by(
-                userId=user.id,
-                coinName=coin_name
-            ).first()
-
-            if wallet_item:
-                wallet_item.balance += amount
-            else:
-                db.session.add(Wallet(
-                    userId=user.id,
-                    coinName=coin_name,
-                    balance=amount
-                ))
-
-            db.session.add(Transaction(
+        if wallet_item:
+            wallet_item.balance += amount
+        else:
+            db.session.add(Wallet(
                 userId=user.id,
                 coinName=coin_name,
-                type="buy",
-                amount=amount,
-                price=price,
-                total=total_cost
+                balance=amount
             ))
 
-            flash(f"Bought {amount} {coin_name} successfully!", "success")
-
-        elif action == "sell":
-            
-            wallet_item = Wallet.query.filter_by(
-                userId=user.id,
-                coinName=coin_name
-            ).first()
-
-            if not wallet_item or wallet_item.balance < amount:
-                flash("Not enough coins to sell!", "warning")
-                return redirect(url_for("dashboard", username=username))
-
-            wallet_item.balance -= amount
-            user.balance += total_cost
-
-            db.session.add(Transaction(
-                userId=user.id,
-                coinName=coin_name,
-                type="sell",
-                amount=amount,
-                price=price,
-                total=total_cost
-            ))
-
-            flash("Coin sold successfully!", "success")
+        db.session.add(Transaction(
+            userId=user.id,
+            coinName=coin_name,
+            type="buy",
+            amount=amount,
+            price=price,
+            total=total_cost
+        ))        
 
         db.session.commit()
+        flash(f"Bought {amount} {coin_name} successfully!", "success")
+        log_action(username, "buy", f"Bought {amount} {coin_name} for ${round(total_cost, 2)}.")
         return redirect(url_for("dashboard", username=username))
 
     all_coins = Coin.query.all()
@@ -308,24 +298,38 @@ def portfolio(username):
         return redirect(url_for("index"))
 
     wallets = Wallet.query.filter_by(userId=user.id).all()
+    transactions = Transaction.query.filter_by(userId=user.id).order_by(Transaction.timestamp.desc()).all()
 
     if request.method == "POST":
         coin_name = request.form.get("coin_name", "").lower().strip()
         amount = request.form.get("amount")
 
         if not coin_name or not amount:
-            flash("Missing coin or amount!")
-            return redirect(url_for("dashboard", username=username))
+            flash("Missing coin or amount!", "warning")
+            return redirect(url_for("portfolio", username=username))
 
         try:
             amount = float(amount)
         except:
-            flash("Invalid amount!")
-            return redirect(url_for("dashboard", username=username))
+            flash("Invalid amount!", "danger")
+            return redirect(url_for("portfolio", username=username))
 
         if amount <= 0:
             flash("Amount must be greater than 0!")
-            return redirect(url_for("dashboard", username=username))
+            return redirect(url_for("portfolio", username=username))
+
+        wallet_item = Wallet.query.filter_by(
+            userId=user.id,
+            coinName=coin_name
+        ).first()
+
+        if not wallet_item:
+            flash("You don't own this coin!", "warning")
+            return redirect(url_for("portfolio", username=username))
+
+        if wallet_item.balance < amount:
+            flash("Not enough coins to sell!", "warning")
+            return redirect(url_for("portfolio", username=username))
 
         url = "https://api.coingecko.com/api/v3/simple/price"
         params = {
@@ -342,38 +346,59 @@ def portfolio(username):
         except Exception as e:
             flash("Price API error!")
             print("API ERROR:", e)
-            return redirect(url_for("dashboard", username=username))
+            return redirect(url_for("portfolio", username=username))
 
         if not isinstance(price_data, dict) or coin_name not in price_data:
-            flash("Coin not found on CoinGecko!")
+            flash("Coin not found on CoinGecko!", "warning")
             return redirect(url_for("portfolio", username=username))
 
         price = price_data[coin_name]["usd"]
         total_cost = price * amount
 
-        user.balance += total_cost
-
-        wallet_item = Wallet.query.filter_by(
-            userId=user.id,
-            coinName=coin_name
-        ).first()
-
-        if not wallet_item:
-            flash("You don't own this coin!")
-            return redirect(url_for("portfolio", username=username))
-
-        if wallet_item.balance < amount:
-            flash("Not enough coins to sell!")
-            return redirect(url_for("portfolio", username=username))
-        
+        # sell logic
         user.balance += total_cost
         wallet_item.balance -= amount
 
+        if wallet_item.balance == 0:
+            db.session.delete(wallet_item)
+
+        db.session.add(Transaction(
+            userId=user.id,
+            coinName=coin_name,
+            type="sell",
+            amount=amount,
+            price=price,
+            total=total_cost
+        ))
+
         db.session.commit()
 
-        flash(f"Sell {amount} {coin_name} successfully!")
+        flash(f"Sell {amount} {coin_name} successfully!", "success")
+        log_action(username, "sell", f"Sold {amount} {coin_name} for ${round(total_cost, 2)}.")
         return redirect(url_for("portfolio", username=username))
     
+    # summary calculations
+    total_invested = sum(t.total for t in transactions if t.type == "buy")
+    total_sold = sum(t.total for t in transactions if t.type == "sell")
+    total_trades = len(transactions)
+    current_value = 0
+    for wallet in wallets:
+        try:
+            response = requests.get(
+                "https://api.coingecko.com/api/v3/simple/price",
+                params={"ids": wallet.coinName, "vs_currencies": "usd"},
+                timeout=5
+            )
+            price_data = response.json()
+            if isinstance(price_data, dict) and wallet.coinName in price_data:
+                current_price = price_data[wallet.coinName]["usd"]
+                current_value += wallet.balance * current_price
+        except Exception as e:
+            print(f"Error fetching price for {wallet.coinName}: {e}")
+
+    profit = current_value + total_sold - total_invested
+    roi = (profit / total_invested * 100) if total_invested > 0 else 0    
+
     return render_template(
         "portfolio.html", 
         username=user.username, 
@@ -381,7 +406,15 @@ def portfolio(username):
         role=user.role,
         wallets=wallets, 
         page_category="portfolio", 
-        view=view
+        view=view,
+        total_invested=round(total_invested, 2),
+        total_sold=round(total_sold, 2),
+        total_trades=total_trades,
+        current_value=round(current_value, 2),
+        profit=round(profit, 2),
+        roi=round(roi, 2),
+        transactions=transactions,
+        page_title="Portfolio"
         )
 
 # ------------- TRANSACTION ----------------
@@ -398,7 +431,16 @@ def transactions(username):
         flash("You are banned", "danger")
         return redirect(url_for("index"))
 
-    transactions = Transaction.query.filter_by(userId=user.id).order_by(Transaction.timestamp.desc()).all()
+    filter_type = request.args.get("type") # buy, sell or all
+    
+    query = Transaction.query.filter_by(userId=user.id)
+    
+    if filter_type == "buy":
+        query = query.filter_by(type="buy")
+    elif filter_type == "sell":
+        query = query.filter_by(type="sell")
+    
+    transactions = query.order_by(Transaction.timestamp.desc()).all()
 
     return render_template(
         "transactions.html", 
@@ -406,6 +448,7 @@ def transactions(username):
         balance=user.balance, 
         role=user.role,
         transactions=transactions,
+        current_filter=filter_type,
         page_title="Transactions"
         )
 
@@ -418,15 +461,34 @@ def admin_dashboard(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        return "User not found!"
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     totalUsers = User.query.count()
+    
+    totalTransactions = Transaction.query.count()
+    
+    totalVolume = db.session.query(db.func.sum(Transaction.total)).scalar() or 0
+
+    most_traded_coins = db.session.query(
+        Transaction.coinName,
+        db.func.count(Transaction.id).label("trade_count")
+    ).group_by(Transaction.coinName).order_by(db.desc("trade_count")).limit(5).all()
+
+    most_traded_coin = most_traded_coins[0].coinName if most_traded_coins else "No data"
 
     return render_template(
         "admin_dashboard.html",
         username=user.username,
         balance=user.balance,
         role=user.role,
+        totalTransactions = totalTransactions,
+        totalVolume = round(totalVolume, 2),
+        most_traded_coin = most_traded_coin,
         totalUsers = totalUsers,
         title="Admin Dashboard"
     )
@@ -439,7 +501,12 @@ def manage_users(username):
     users = User.query.all()
 
     if not user:
-        return "User not found!"
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     if request.method == 'POST':
         user_id = request.form.get('user_id')
@@ -449,8 +516,10 @@ def manage_users(username):
         if user_to_change:
             if admin_action == "ban":
                 user_to_change.is_banned = True
+                log_action(user_to_change.username, "ban", f"{user_to_change.username} was banned by admin.")
             elif admin_action == "unban":
                 user_to_change.is_banned = False
+                log_action(user_to_change.username, "unban", f"{user_to_change.username} was unbanned by admin.")
 
             db.session.commit()
 
@@ -468,6 +537,14 @@ def manage_users(username):
 @app.route("/manage_coins/<username>", methods=["GET", "POST"])
 def manage_coins(username):
     user = User.query.filter_by(username=username).first()
+
+    if not user:
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
         coin_name = request.form.get("coin_name", "").lower().strip()
@@ -541,12 +618,25 @@ def logs(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        return "User not found!"
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
+
+    search = request.args.get("search", "")
+
+    if search:
+        logs = Log.query.filter(Log.username.contains(search) | Log.action.contains(search) | Log.description.contains(search)).order_by(Log.timestamp.desc()).all()
+    else:
+        logs = Log.query.order_by(Log.timestamp.desc()).all()
 
     return render_template(
         "logs.html",
         username=user.username,
         balance=user.balance,
+        logs=logs,
         role=user.role,
         title="System Logs"
     )

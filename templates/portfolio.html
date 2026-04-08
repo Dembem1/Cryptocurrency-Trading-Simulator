@@ -6,109 +6,118 @@
 <div class="container-fluid">
     <h2 class="text-white mb-4">Portfolio Analysis</h2>
     
+    <!-- Navigation tabs -->
     <ul class="nav nav-tabs mb-4 border-secondary">
         <li class="nav-item">
-            <a class="nav-link {% if view == 'wallet' %}active{% endif %}" 
-               href="{{ url_for('portfolio', username=username, view='wallet') }}">Wallet</a>
+            <a class="nav-link {% if view == 'summary' %}active{% endif %}" href="{{ url_for('portfolio', username=username, view='summary') }}">Summary</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if view == 'summary' %}active{% endif %}" 
-               href="{{ url_for('portfolio', username=username, view='summary') }}">Summary</a>
+            <a class="nav-link {% if view == 'wallet' %}active{% endif %}" href="{{ url_for('portfolio', username=username, view='wallet') }}">Wallet</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if view == 'performance' %}active{% endif %}" 
-               href="{{ url_for('portfolio', username=username, view='performance') }}">Performance View</a>
+            <a class="nav-link {% if view == 'performance' %}active{% endif %}" href="{{ url_for('portfolio', username=username, view='performance') }}">Performance View</a>
         </li>
     </ul>
 
+    <!-- Conditional rendering -->
     {% if view == 'wallet' %}
 
-    <div class="row">
-    {% for coin in wallets %}
-    <div class="col-md-4 mb-3">
-        <div class="card p-4 text-center border-secondary bg-dark text-white">
+        <!-- WALLET VIEW -->
+        <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
+            <h5 class="mb-3">Your Wallet</h5>
 
-            <h6 class="text-muted small text-uppercase">
-                {{ coin.coinName }}
-            </h6>
-
-            <h4 class="mt-2">
-                {{ coin.balance }}
-            </h4>
-            
-            <form method="POST", action="{{ url_for('portfolio', username=username) }}">
-                <input type="hidden" name="coin_name" value="{{ coin.coinName }}">
-
-                <input type="number" step="0.0001" name="amount" placeholder="Amount" class="form-control mb-2">
-
-                <button type="submit" class="btn btn-success btn-sm">
-                    Sell
-                </button>
-            </form>
-
+            {% if portfolio %}
+                <ul class="list-group list-group-flush">
+                    {% for asset in portfolio %}
+                        <li class="list-group-item bg-dark text-white d-flex justify-content-between">
+                            <span>{{ asset.name }}</span>
+                            <span>{{ asset.amount }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No assets in your wallet yet.</p>
+            {% endif %}
         </div>
-    </div>
-    {% endfor %}
-    </div>
 
     {% elif view == 'summary' %}
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card p-4 text-center border-secondary bg-dark text-white">
-                <h6 class="text-muted small text-uppercase">Current ROI %</h6>
-                <h2 class="text-success mt-2">+5.80%</h2>
-            </div>
+
+        <!-- SUMMARY VIEW -->
+        <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
+            <h5 class="mb-3">Portfolio Summary</h5>
+
+            <p><strong>Total Value:</strong> {{ total_value }}</p>
+            <p><strong>Total Assets:</strong> {{ portfolio|length }}</p>
+
+            {% if portfolio %}
+                <ul>
+                    {% for asset in portfolio %}
+                        <li>{{ asset.name }}: {{ asset.amount }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
-    </div>
 
     {% elif view == 'performance' %}
-    <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="m-0">Profit/Loss Performance</h5>
-            <span class="badge bg-primary">7-Day View</span>
+    
+        <!-- PERFORMANCE VIEW -->
+        <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="m-0">Portfolio Performance</h5>
+                <span class="badge bg-primary">Transaction History</span>
+            </div>
+            
+            {% if transactions|length > 1 %}
+                <div style="height: 500px; width: 100%;">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            {% else %}
+                <div class="text-center py-5 border border-secondary rounded" style="background: rgba(255,255,255,0.02);">
+                    <i class="bi bi-graph-up text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-secondary">Not Enough Data</h4>
+                    <p class="text-muted">You need at least 2 transactions to generate a performance trend graph.</p>
+                    <a href="{{ url_for('dashboard', username=username) }}" class="btn btn-outline-primary btn-sm mt-2">Go to Market</a>
+                </div>
+            {% endif %}
         </div>
-        
-        <div style="height: 350px; width: 100%;">
-            <canvas id="performanceChart"></canvas>
-        </div>
-    </div>
 
-    <script>
-        // Chart.js setup
-        var ctx = document.getElementById('performanceChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Portfolio Value ($)',
-                    data: [1000, 1050, 1020, 1100, 1150, 1210, 1250],
-                    borderColor: '#0d6efd', // blue
-                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.2 // for the curved line on chart
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false } // to keep it clean
-                },
-                scales: {
-                    y: { 
-                        grid: { color: '#374151' }, 
-                        ticks: { color: '#9ca3af' } 
+        {% if transactions|length > 1 %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+
+                const labels = [{% for t in transactions|reverse %}"{{ t.timestamp.strftime('%d %b %H:%M') }}",{% endfor %}];
+                const values = [{% for t in transactions|reverse %}{{ t.total }},{% endfor %}];
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Transaction Value',
+                            data: values,
+                            borderColor: '#3b82f6', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4, 
+                            pointRadius: 5,
+                            pointBackgroundColor: '#ffffff'
+                        }]
                     },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { color: '#9ca3af' }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9ca3af' } },
+                            x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                        }
                     }
-                }
-            }
-        });
-    </script>
-    {% endif %}
+                });
+            });
+        </script>
+        {% endif %}
+
+    {% endif %} 
 </div>
 {% endblock %}
