@@ -8,6 +8,15 @@
     <div class="card shadow" style="width: 400px;">
         <div class="card-body text-center">
             <h2 class="mb-4">Register</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} py-2 small">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+            
             <form action="/register" method="POST">
                 <div class="mb-3"><input type="text" name="username" class="form-control" placeholder="Username" required></div>
                 <div class="mb-3"><input type="email" name="email" class="form-control" placeholder="Email" required></div>

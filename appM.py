@@ -43,7 +43,17 @@ class Coin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
 
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
 
+    id = db.Column(db.Integer, primary_key=True)
+    userId = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    coinName = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(10), nullable=False) # buy or sell
+    amount = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
 # --------- PUBLIC ROUTE ----------
 
@@ -67,21 +77,23 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        flash("User not found!")
- 
-    if check_password_hash(user.password, password):
-        if user.role == "admin":
-            return redirect(url_for("admin_dashboard", username=username))
-        elif user.role == "user":
-            if user.is_banned == False:
-                flash("Login details correct! Redirecting...")
-                return redirect(url_for("dashboard", username=username))
-            else:
-                flash("You were banned, please contact admin for future actions!")
-                return redirect(url_for("index"))
-    else:
-        flash("Invalid username or password.", "danger")
+        flash("User not found!", "danger")
         return redirect(url_for("index"))
+ 
+    if not check_password_hash(user.password, password):
+        flash("Invalid password", "danger")
+        return redirect(url_for("index"))
+    
+    if user.is_banned:
+        flash("You are banned", "danger")
+        return redirect(url_for("index"))
+
+    flash("Login successful!", "success")
+
+    if user.role == "admin":
+        return redirect(url_for("admin_dashboard", username=username))
+    else:
+        return redirect(url_for("dashboard", username=username))
     
 # ------------ REGISTRATION --------------
 @app.route("/register", methods=["GET", "POST"])
@@ -90,16 +102,17 @@ def register():
     if request.method == "POST":
 
         username = request.form.get("username")
-        existingUser = User.query.filter_by(username=username).first()
         email = request.form.get("email")
         password = request.form.get("password")
+
+        existingUser = User.query.filter((User.username==username) | (User.email==email)).first()
 
         if not username or not email or not password:
             flash("All fields are required.", "warning")
             return redirect(url_for("register"))
 
         if existingUser:
-            flash("Username already taken!")
+            flash("Username or email already taken!", "warning")
             return redirect(url_for("register"))
 
         if username and email and password:
@@ -128,25 +141,30 @@ def dashboard(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        flash("User not found!")
-        return redirect(url_for("home"))
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.is_banned:
+        flash("You are banned", "danger")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
         coin_name = request.form.get("coin_name", "").lower().strip()
         amount = request.form.get("amount")
+        action = request.form.get("action") # buy or sell
 
         if not coin_name or not amount:
-            flash("Missing coin or amount!")
+            flash("Missing coin or amount!", "warning")
             return redirect(url_for("dashboard", username=username))
 
         try:
             amount = float(amount)
         except:
-            flash("Invalid amount!")
+            flash("Invalid amount!", "danger")
             return redirect(url_for("dashboard", username=username))
 
         if amount <= 0:
-            flash("Amount must be greater than 0!")
+            flash("Amount must be greater than 0!", "warning")
             return redirect(url_for("dashboard", username=username))
 
         url = "https://api.coingecko.com/api/v3/simple/price"
@@ -162,40 +180,77 @@ def dashboard(username):
             print("PRICE API RESPONSE:", price_data)
 
         except Exception as e:
-            flash("Price API error!")
+            flash("Price API error!", "danger")
             print("API ERROR:", e)
             return redirect(url_for("dashboard", username=username))
 
         if not isinstance(price_data, dict) or coin_name not in price_data:
-            flash("Coin not found on CoinGecko!")
+            flash("Coin not found on CoinGecko!", "warning")
             return redirect(url_for("dashboard", username=username))
 
         price = price_data[coin_name]["usd"]
         total_cost = price * amount
 
-        if user.balance < total_cost:
-            flash("Not enough balance!")
-            return redirect(url_for("dashboard", username=username))
+        # buy logic
+        if action == "buy":
 
-        user.balance -= total_cost
+            if user.balance < total_cost:
+                flash("Not enough balance!", "warning")
+                return redirect(url_for("dashboard", username=username))
 
-        wallet_item = Wallet.query.filter_by(
-            userId=user.id,
-            coinName=coin_name
-        ).first()
+            user.balance -= total_cost
 
-        if wallet_item:
-            wallet_item.balance += amount
-        else:
-            db.session.add(Wallet(
+            wallet_item = Wallet.query.filter_by(
+                userId=user.id,
+                coinName=coin_name
+            ).first()
+
+            if wallet_item:
+                wallet_item.balance += amount
+            else:
+                db.session.add(Wallet(
+                    userId=user.id,
+                    coinName=coin_name,
+                    balance=amount
+                ))
+
+            db.session.add(Transaction(
                 userId=user.id,
                 coinName=coin_name,
-                balance=amount
+                type="buy",
+                amount=amount,
+                price=price,
+                total=total_cost
             ))
 
-        db.session.commit()
+            flash(f"Bought {amount} {coin_name} successfully!", "success")
 
-        flash(f"Bought {amount} {coin_name} successfully!")
+        elif action == "sell":
+            
+            wallet_item = Wallet.query.filter_by(
+                userId=user.id,
+                coinName=coin_name
+            ).first()
+
+            if not wallet_item or wallet_item.balance < amount:
+                flash("Not enough coins to sell!", "warning")
+                return redirect(url_for("dashboard", username=username))
+
+            wallet_item.balance -= amount
+            user.balance += total_cost
+
+            db.session.add(Transaction(
+                userId=user.id,
+                coinName=coin_name,
+                type="sell",
+                amount=amount,
+                price=price,
+                total=total_cost
+            ))
+
+            flash("Coin sold successfully!", "success")
+
+        db.session.commit()
         return redirect(url_for("dashboard", username=username))
 
     all_coins = Coin.query.all()
@@ -245,7 +300,12 @@ def portfolio(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        flash("User not found!")
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.is_banned:
+        flash("You are banned", "danger")
+        return redirect(url_for("index"))
 
     wallets = Wallet.query.filter_by(userId=user.id).all()
 
@@ -331,13 +391,21 @@ def transactions(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        flash("User not found!")
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.is_banned:
+        flash("You are banned", "danger")
+        return redirect(url_for("index"))
+
+    transactions = Transaction.query.filter_by(userId=user.id).order_by(Transaction.timestamp.desc()).all()
 
     return render_template(
         "transactions.html", 
         username=user.username, 
         balance=user.balance, 
-        role=user.role, 
+        role=user.role,
+        transactions=transactions,
         page_title="Transactions"
         )
 
@@ -486,4 +554,6 @@ def logs(username):
 # ------------- RUN APP -------------
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
