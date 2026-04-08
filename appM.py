@@ -121,42 +121,115 @@ def register():
 # ------------ USER ROUTES ---------
 
 # ------------ DASHBOARD ------------
-@app.route("/dashboard/<username>")
+@app.route("/dashboard/<username>", methods=["GET", "POST"])
 def dashboard(username):
     user = User.query.filter_by(username=username).first()
+
+    if not user:
+        flash("User not found!")
+        return redirect(url_for("home"))
+
+    if request.method == "POST":
+        coin_name = request.form.get("coin_name", "").lower().strip()
+        amount = request.form.get("amount")
+
+        if not coin_name or not amount:
+            flash("Missing coin or amount!")
+            return redirect(url_for("dashboard", username=username))
+
+        try:
+            amount = float(amount)
+        except:
+            flash("Invalid amount!")
+            return redirect(url_for("dashboard", username=username))
+
+        if amount <= 0:
+            flash("Amount must be greater than 0!")
+            return redirect(url_for("dashboard", username=username))
+
+        url = "https://api.coingecko.com/api/v3/simple/price"
+        params = {
+            "ids": coin_name,
+            "vs_currencies": "usd"
+        }
+
+        try:
+            response = requests.get(url, params=params, timeout=5)
+            price_data = response.json()
+
+            print("PRICE API RESPONSE:", price_data)
+
+        except Exception as e:
+            flash("Price API error!")
+            print("API ERROR:", e)
+            return redirect(url_for("dashboard", username=username))
+
+        if not isinstance(price_data, dict) or coin_name not in price_data:
+            flash("Coin not found on CoinGecko!")
+            return redirect(url_for("dashboard", username=username))
+
+        price = price_data[coin_name]["usd"]
+        total_cost = price * amount
+
+        if user.balance < total_cost:
+            flash("Not enough balance!")
+            return redirect(url_for("dashboard", username=username))
+
+        user.balance -= total_cost
+
+        wallet_item = Wallet.query.filter_by(
+            userId=user.id,
+            coinName=coin_name
+        ).first()
+
+        if wallet_item:
+            wallet_item.balance += amount
+        else:
+            db.session.add(Wallet(
+                userId=user.id,
+                coinName=coin_name,
+                balance=amount
+            ))
+
+        db.session.commit()
+
+        flash(f"Bought {amount} {coin_name} successfully!")
+        return redirect(url_for("dashboard", username=username))
+
     all_coins = Coin.query.all()
+    coins_ids = [c.name.lower().strip() for c in all_coins if c.name]
 
-    coins_ids = [coin.name for coin in all_coins]
-
-    data = {}
+    data = []
 
     if coins_ids:
         ids_string = ",".join(coins_ids)
 
         url = "https://api.coingecko.com/api/v3/coins/markets"
         params = {
-            'vs_currency': 'usd',
-            'ids': ids_string,
-            'include_24hr_change': 'true',
-            'include_last_updated_at': 'true'
+            "vs_currency": "usd",
+            "ids": ids_string,
+            "include_24hr_change": "true"
         }
 
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=5)
             data = response.json()
-        except Exception as e:
-            print(f"Error fetching data: {e}")
-            data = {}
 
-    if not user:
-        flash("User not found!")
-        return redirect(url_for("home"))
+            print("MARKET API RESPONSE TYPE:", type(data))
+
+            if not isinstance(data, list):
+                print("Unexpected API response:", data)
+                data = []
+
+        except Exception as e:
+            print(f"Error fetching market data: {e}")
+            data = []
 
     return render_template(
-        "dashboard.html", 
-        username=user.username, 
-        balance=user.balance, 
-        role=user.role, 
+        "dashboard.html",
+        username=user.username,
+        balance=user.balance,
+        role=user.role,
         prices=data,
         page_title="Dashboard"
     )
