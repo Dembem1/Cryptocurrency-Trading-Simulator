@@ -8,28 +8,41 @@
                 <h5 class="mb-0">Market Overview</h5>
             </div>
             <div class="card-body">
-                <table class="table table-hover">
+                <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>Coin</th>
                             <th>Symbol</th>
                             <th>Current Price</th>
-                            <th>Action</th>
+                            <th>24h Change</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Bitcoin</td>
-                            <td>BTC</td>
-                            <td>£50,000.00</td>
-                            <td><button class="btn btn-sm btn-outline-primary">Trade</button></td>
-                        </tr>
-                        <tr>
-                            <td>Ethereum</td>
-                            <td>ETH</td>
-                            <td>£2,500.00</td>
-                            <td><button class="btn btn-sm btn-outline-primary">Trade</button></td>
-                        </tr>
+                        <div class="row">
+                            {% for coin in prices %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card shadow-sm p-3">
+                                    <img src="{{ coin.image }}" 
+                                    alt="{{ coin.name }}" 
+                                    width="40" 
+                                    height="40"
+                                    class="me-3">
+                                    <h5 style="text-transform: capitalize;">{{ coin.name }}</h5>
+                                    <p><strong>Symbol:</strong> {{ coin.symbol.upper() }}</p>
+                                    <p class="price">${{ "{:,.2f}".format(coin.current_price) }}</p>
+                                    <p class="{{ 'text-success' if coin.price_change_percentage_24h > 0 else 'text-danger' }}">
+                                        {{ "%.2f"|format(coin.price_change_percentage_24h) }}%
+                                    </p>
+                                    <form method="post">
+                                        <input type="hidden" name="" value="">
+                                        <button class="btn btn-sm btn-outline-danger" name="action" value="buy">Buy</button>
+                                        <input type="hidden" name="" value="">
+                                        <button class="btn btn-sm btn-outline-danger" name="action" value="sell">Sell</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </tbody>
                 </table>
             </div>
