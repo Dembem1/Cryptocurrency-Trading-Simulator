@@ -43,6 +43,8 @@ class Coin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
 
+
+
 # --------- PUBLIC ROUTE ----------
 
 @app.route("/")
@@ -235,6 +237,7 @@ def dashboard(username):
     )
 
 # -------- PORTFOLIO --------------
+
 @app.route("/portfolio/<username>")
 def portfolio(username):
     view = request.args.get("view", "summary") # EXAMPLES OF SUMMARY AND VIEW OF SOMETHING
@@ -244,11 +247,14 @@ def portfolio(username):
     if not user:
         flash("User not found!")
 
+    wallets = Wallet.query.filter_by(userId=user.id).all()
+
     return render_template(
         "portfolio.html", 
         username=user.username, 
         balance=user.balance, 
-        role=user.role, 
+        role=user.role,
+        wallets=wallets, 
         page_category="portfolio", 
         view=view
         )
