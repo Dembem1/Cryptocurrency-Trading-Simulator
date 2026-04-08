@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+import requests
 
 # ------------------- DATABASE, APP, MIGRATION, FLASH MESSAGES ----------------------------
 app = Flask(__name__)
@@ -35,6 +36,12 @@ class Wallet(db.Model):
     coinName = db.Column(db.String(100), nullable=False)
     balance = db.Column(db.Float, default=0.0)
     userId = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+class Coin(db.Model):
+    __tablename__ = 'coins'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
 
 # --------- PUBLIC ROUTE ----------
 
@@ -117,17 +124,42 @@ def register():
 @app.route("/dashboard/<username>")
 def dashboard(username):
     user = User.query.filter_by(username=username).first()
+    all_coins = Coin.query.all()
+
+    coins_ids = [coin.name for coin in all_coins]
+
+    data = {}
+
+    if coins_ids:
+        ids_string = ",".join(coins_ids)
+
+        url = "https://api.coingecko.com/api/v3/coins/markets"
+        params = {
+            'vs_currency': 'usd',
+            'ids': ids_string,
+            'include_24hr_change': 'true',
+            'include_last_updated_at': 'true'
+        }
+
+        try:
+            response = requests.get(url, params=params)
+            data = response.json()
+        except Exception as e:
+            print(f"Error fetching data: {e}")
+            data = {}
 
     if not user:
         flash("User not found!")
+        return redirect(url_for("home"))
 
     return render_template(
         "dashboard.html", 
         username=user.username, 
         balance=user.balance, 
         role=user.role, 
+        prices=data,
         page_title="Dashboard"
-        )
+    )
 
 # -------- PORTFOLIO --------------
 @app.route("/portfolio/<username>")
@@ -221,18 +253,71 @@ def manage_users(username):
 
 # ------- MANAGING COINS (NOT IN USE) -------------
 
-@app.route("/manage_coins/<username>")
+@app.route("/manage_coins/<username>", methods=["GET", "POST"])
 def manage_coins(username):
     user = User.query.filter_by(username=username).first()
 
+    if request.method == "POST":
+        coin_name = request.form.get("coin_name", "").lower().strip()
+        action = request.form.get("action")
+
+        if not coin_name:
+            flash("Please enter coin name!")
+            return redirect(url_for("manage_coins", username=username))
+        
+        if action == "add":
+            is_exist = Coin.query.filter_by(name=coin_name.lower()).first()
+
+            if is_exist:
+                flash("Coin already exist!")
+            else:
+                new_coin = Coin(name=coin_name)
+                db.session.add(new_coin)
+                db.session.commit()
+                flash("New coin added!")
+        elif action == "delete":
+            coin = Coin.query.filter_by(name=coin_name.lower()).first()
+
+            if coin:
+                db.session.delete(coin)
+                db.session.commit()
+                flash("Coin deleted")
+            else:
+                flash("Coin not found!")
+        
+    all_coins = Coin.query.all()
+    coins_ids = [coin.name for coin in all_coins]
+
+    data = {}
+    if coins_ids:
+        ids_string = ",".join(coins_ids)
+
+        url = f"https://api.coingecko.com/api/v3/simple/price"
+        params = {
+            'ids': ids_string,
+            'vs_currencies': 'usd',
+            'include_24hr_change': 'true',
+            'include_last_update_at': 'true'
+        }
+
+    try:
+        response = requests.get(url, params=params)
+        data = response.json()
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        data = {}
+
     if not user:
         return "User not found!"
+
+
 
     return render_template(
         "manage_coins.html",
         username=user.username,
         balance=user.balance,
         role=user.role,
+        prices=data,
         title="Manage Coins"
     )
 
