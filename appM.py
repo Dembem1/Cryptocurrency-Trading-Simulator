@@ -292,7 +292,8 @@ def dashboard(username):
     )
 
 # -------- PORTFOLIO --------------
-@app.route("/portfolio/<username>")
+
+@app.route("/portfolio/<username>", methods=["GET", "POST"])
 def portfolio(username):
     view = request.args.get("view", "summary") # EXAMPLES OF SUMMARY AND VIEW OF SOMETHING
 
@@ -306,11 +307,79 @@ def portfolio(username):
         flash("You are banned", "danger")
         return redirect(url_for("index"))
 
+    wallets = Wallet.query.filter_by(userId=user.id).all()
+
+    if request.method == "POST":
+        coin_name = request.form.get("coin_name", "").lower().strip()
+        amount = request.form.get("amount")
+
+        if not coin_name or not amount:
+            flash("Missing coin or amount!")
+            return redirect(url_for("dashboard", username=username))
+
+        try:
+            amount = float(amount)
+        except:
+            flash("Invalid amount!")
+            return redirect(url_for("dashboard", username=username))
+
+        if amount <= 0:
+            flash("Amount must be greater than 0!")
+            return redirect(url_for("dashboard", username=username))
+
+        url = "https://api.coingecko.com/api/v3/simple/price"
+        params = {
+            "ids": coin_name,
+            "vs_currencies": "usd"
+        }
+
+        try:
+            response = requests.get(url, params=params, timeout=5)
+            price_data = response.json()
+
+            print("PRICE API RESPONSE:", price_data)
+
+        except Exception as e:
+            flash("Price API error!")
+            print("API ERROR:", e)
+            return redirect(url_for("dashboard", username=username))
+
+        if not isinstance(price_data, dict) or coin_name not in price_data:
+            flash("Coin not found on CoinGecko!")
+            return redirect(url_for("portfolio", username=username))
+
+        price = price_data[coin_name]["usd"]
+        total_cost = price * amount
+
+        user.balance += total_cost
+
+        wallet_item = Wallet.query.filter_by(
+            userId=user.id,
+            coinName=coin_name
+        ).first()
+
+        if not wallet_item:
+            flash("You don't own this coin!")
+            return redirect(url_for("portfolio", username=username))
+
+        if wallet_item.balance < amount:
+            flash("Not enough coins to sell!")
+            return redirect(url_for("portfolio", username=username))
+        
+        user.balance += total_cost
+        wallet_item.balance -= amount
+
+        db.session.commit()
+
+        flash(f"Sell {amount} {coin_name} successfully!")
+        return redirect(url_for("portfolio", username=username))
+    
     return render_template(
         "portfolio.html", 
         username=user.username, 
         balance=user.balance, 
-        role=user.role, 
+        role=user.role,
+        wallets=wallets, 
         page_category="portfolio", 
         view=view
         )
