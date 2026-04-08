@@ -8,6 +8,10 @@
     
     <ul class="nav nav-tabs mb-4 border-secondary">
         <li class="nav-item">
+            <a class="nav-link {% if view == 'wallet' %}active{% endif %}" 
+               href="{{ url_for('portfolio', username=username, view='wallet') }}">Wallet</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link {% if view == 'summary' %}active{% endif %}" 
                href="{{ url_for('portfolio', username=username, view='summary') }}">Summary</a>
         </li>
@@ -17,7 +21,27 @@
         </li>
     </ul>
 
-    {% if view == 'summary' %}
+    {% if view == 'wallet' %}
+
+    <div class="row">
+    {% for coin in wallets %}
+    <div class="col-md-4 mb-3">
+        <div class="card p-4 text-center border-secondary bg-dark text-white">
+
+            <h6 class="text-muted small text-uppercase">
+                {{ coin.coinName }}
+            </h6>
+
+            <h4 class="mt-2">
+                {{ coin.balance }}
+            </h4>
+
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+
+    {% elif view == 'summary' %}
     <div class="row">
         <div class="col-md-4">
             <div class="card p-4 text-center border-secondary bg-dark text-white">
