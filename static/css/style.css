@@ -1,44 +1,45 @@
-/* Test style for dark mode */
-body.dark-mode{
+/* ============================================================
+   DARK MODE BASE
+   ============================================================ */
 
-background:#121212;
-color:#e5e5e5;
-
+body.dark-mode {
+    background: #121212;
+    color: #e5e5e5;
 }
 
-body.dark-mode .topbar{
-
-background:#1f1f1f;
-border-bottom:1px solid #333;
-
+/* Topbar */
+body.dark-mode .topbar {
+    background: #1f1f1f;
+    border-bottom: 1px solid #333;
 }
 
-body.dark-mode .sidebar{
-
-background:#1a1a1a;
-
+/* Sidebar */
+body.dark-mode .sidebar {
+    background: #1a1a1a;
 }
 
-body.dark-mode .theme-bar{
-
-background:#1f1f1f;
-
+/* Theme switch bar */
+body.dark-mode .theme-bar {
+    background: #1f1f1f;
 }
 
-body.dark-mode .main-content{
-
-background:#121212;
-
+/* Main content area */
+body.dark-mode .main-content {
+    background: #121212;
 }
 
-/* If we are on the login or register page hide the navigation elements */
-body:has(.auth-card), /* if you add an auth-card class */
-body:has(form[action="/login"]), 
+/* ============================================================
+   LOGIN / REGISTER PAGES
+   ============================================================ */
+
+/* Adjust background */
+body:has(.auth-card),
+body:has(form[action="/login"]),
 body:has(form[action="/register"]) {
-    background-color: #0f172a; 
+    background-color: #0f172a;
 }
 
-/* Hide Sidebar and Topbar on auth pages */
+/* Hide navigation on */
 body:has(form[action="/login"]) .sidebar,
 body:has(form[action="/register"]) .sidebar,
 body:has(form[action="/login"]) .topbar,
@@ -46,6 +47,7 @@ body:has(form[action="/register"]) .topbar {
     display: none !important;
 }
 
+/* Full width layout */
 body:has(form[action="/login"]) .main-content,
 body:has(form[action="/register"]) .main-content {
     margin-left: 0 !important;
