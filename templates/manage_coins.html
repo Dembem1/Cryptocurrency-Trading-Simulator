@@ -1,32 +1,121 @@
 {% extends "layout.html" %}
+
 {% block content %}
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <form method="POST" class="row g-3">
-            <div class="col-auto">
-                <input type="text" name="coin_name" class="form-control" placeholder="Enter Coin Name (e.g. bitcoin)">
-            </div>
-            <div class="col-auto">
-                <button type="submit" name="action" value="add" class="btn btn-primary">Add Coin</button>
-            </div>
-            <div class="col-auto">
-                <button type="submit" name="action" value="delete" class="btn btn-primary">Delete Coin</button>
-            </div>
-        </form>
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Coin Management</h1>
+        <span class="badge bg-primary">Admin Portal</span>
     </div>
-</div>
-<h1>Live Crypto Prices</h1>
-    <div>
-        {% for coin, details in prices.items() %}
-        <div class="crypto-card">
-            <span style="text-transform: capitalize;"><strong>{{ coin }}</strong></span>
-            <span>
-                <span class="price">${{ "{:,.2f}".format(details['usd']) }}</span>
-                <span class="change {{ 'positive' if details.usd_24h_change > 0 else 'negative' }}">
-                    ({{ "%.2f"|format(details.usd_24h_change) }}%)
-                </span>
-            </span>
+
+    <div class="card shadow-sm mb-5 border-0 bg-dark text-white">
+        
+        <!-- Card header -->
+        <div class="card-header border-secondary bg-transparent">
+            <h5 class="mb-0">Add New Cryptocurrency</h5>
         </div>
+
+        <div class="card-body">
+            <p class="text-muted small mb-3">
+                Enter the coin ID as found on CoinGecko 
+                (e.g., 'bitcoin', 'ethereum', 'solana').
+            </p>
+
+            <!-- Form to submit new coin -->
+            <form method="POST" class="row g-3">
+                
+                <div class="col-md-8">
+                    <input type="text" name="coin_name" 
+                           class="form-control bg-secondary text-white border-0" 
+                           placeholder="Enter Coin Name (e.g. bitcoin)" required>
+                </div>
+
+                <div class="col-md-4">
+                    <button type="submit" name="action" value="add" 
+                            class="btn btn-primary w-100">
+                        <!-- icon for visual -->
+                        <i class="bi bi-plus-circle me-1"></i> Add to System
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- live data -->
+    <h4 class="mb-3">Live Market Overview</h4>
+    
+    {% if prices %}
+
+    <div class="row g-4">
+
+        <!-- Loop through each coin and its details -->
+        {% for coin, details in prices.items() %}
+
+        <div class="col-md-4 col-sm-6">
+
+            <div class="card h-100 shadow-sm border-0 bg-dark text-white">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title text-capitalize mb-0">{{ coin }}</h5>
+                        <span class="badge bg-success small">Live</span>
+                    </div>
+                    
+                    <hr class="border-secondary opacity-25">
+
+                    <div class="py-2">
+                        <p class="text-muted small mb-1">Current Price (USD)</p>
+                        <h3 class="fw-bold mb-0">
+                            ${{ "{:,.2f}".format(details['usd']) }}
+                        </h3>
+                    </div>
+
+                    <div class="mb-4">
+
+                        <!-- Styling based on positive/negative change -->
+                        <span class="fw-bold 
+                            {% if details.usd_24h_change > 0 %}
+                                text-success
+                            {% else %}
+                                text-danger
+                            {% endif %}">
+                            
+                            {% if details.usd_24h_change > 0 %}+{% endif %}
+                            
+                            {{ "%.2f"|format(details.usd_24h_change) }}%
+                        </span>
+
+                        <small class="text-muted ms-1">24h change</small>
+                    </div>
+
+                    <!-- Form to remove coin from system -->
+                    <form method="POST" 
+                          onsubmit="return confirm('Are you sure you want to remove {{ coin|capitalize }}?');">
+                        
+                        <input type="hidden" name="coin_name" value="{{ coin }}">
+
+                        <!-- Delete button -->
+                        <button type="submit" name="action" value="delete" 
+                                class="btn btn-outline-danger btn-sm w-100">
+                            Remove from List
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
         {% endfor %}
     </div>
+
+    {% else %}
+    <div class="text-center py-5 bg-dark rounded shadow-sm">
+        <p class="text-muted mb-0">
+            No coins are currently tracked. Add one above to get started.
+        </p>
+    </div>
+    {% endif %}
+
+</div>
 {% endblock %}
