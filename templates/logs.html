@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="mb-3">
-    <input type="text" class="form-control" placeholder="Search logs...">
-</div>
+<!-- search bar -->
+<form method="GET" class="mb-3">
+    <input type="text" name="search" class="form-control" placeholder="Search logs..." value="{{ search }}">
+</form>
+
+<!-- logs table -->
 <div class="card shadow-sm">
     <div class="card-body p-0">
         <table class="table mb-0">
@@ -10,9 +13,20 @@
                 <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Description</th></tr>
             </thead>
             <tbody>
-                <tr><td>2026-02-10 14:30</td><td>admin</td><td>LOGIN</td><td>Admin session started</td></tr>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.description }}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+{% if not logs %}
+    <p>No logs found</p>
+{% endif %}
+
 {% endblock %}

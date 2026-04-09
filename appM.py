@@ -55,6 +55,20 @@ class Transaction(db.Model):
     total = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+class Log(db.Model):
+    __tablename__ = 'logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    action = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255))
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+def log_action(username, action, description):
+    new_log = Log(username=username, action=action, description=description)
+    db.session.add(new_log)
+    db.session.commit()
+
 # --------- PUBLIC ROUTE ----------
 
 @app.route("/")
@@ -89,6 +103,7 @@ def login():
         return redirect(url_for("index"))
 
     flash("Login successful!", "success")
+    log_action(username, "login", "User logged in successfully.")
 
     if user.role == "admin":
         return redirect(url_for("admin_dashboard", username=username))
@@ -129,6 +144,8 @@ def register():
                 print(e)
 
         flash("Registration successful. Please login.", "success")
+        log_action(username, "register", "User registered successfully.")
+
         return redirect(url_for("index"))
 
     return render_template("register.html")
@@ -219,10 +236,11 @@ def dashboard(username):
             amount=amount,
             price=price,
             total=total_cost
-        ))  
+        ))        
 
         db.session.commit()
         flash(f"Bought {amount} {coin_name} successfully!", "success")
+        log_action(username, "buy", f"Bought {amount} {coin_name} for ${round(total_cost, 2)}.")
         return redirect(url_for("dashboard", username=username))
 
     all_coins = Coin.query.all()
@@ -356,6 +374,7 @@ def portfolio(username):
         db.session.commit()
 
         flash(f"Sell {amount} {coin_name} successfully!", "success")
+        log_action(username, "sell", f"Sold {amount} {coin_name} for ${round(total_cost, 2)}.")
         return redirect(url_for("portfolio", username=username))
     
     # summary calculations
@@ -497,8 +516,10 @@ def manage_users(username):
         if user_to_change:
             if admin_action == "ban":
                 user_to_change.is_banned = True
+                log_action(user_to_change.username, "ban", f"{user_to_change.username} was banned by admin.")
             elif admin_action == "unban":
                 user_to_change.is_banned = False
+                log_action(user_to_change.username, "unban", f"{user_to_change.username} was unbanned by admin.")
 
             db.session.commit()
 
@@ -604,10 +625,18 @@ def logs(username):
         flash("Access denied", "danger")
         return redirect(url_for("index"))
 
+    search = request.args.get("search", "")
+
+    if search:
+        logs = Log.query.filter(Log.username.contains(search) | Log.action.contains(search) | Log.description.contains(search)).order_by(Log.timestamp.desc()).all()
+    else:
+        logs = Log.query.order_by(Log.timestamp.desc()).all()
+
     return render_template(
         "logs.html",
         username=user.username,
         balance=user.balance,
+        logs=logs,
         role=user.role,
         title="System Logs"
     )

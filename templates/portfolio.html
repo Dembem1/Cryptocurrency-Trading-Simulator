@@ -108,6 +108,13 @@
         <div style="height: 600px; width: 100%;">
             <canvas id="performanceChart"></canvas>
         </div>
+        
+        {%if transactions|length == 0 %}
+            <div class="alert alert-info mt-4">
+                No transactions found. Start trading to see your performance here!
+            </div>
+        {% endif %}
+
     </div>
 
     <script>
