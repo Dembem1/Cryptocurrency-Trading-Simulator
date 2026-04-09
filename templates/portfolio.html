@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="container-fluid">
-    <h2 class="text-white mb-4">Portfolio Analysis</h2>
+    <h2 class="portfolio-header">Portfolio Analysis</h2>
     
     <!-- Navigation tabs -->
     <ul class="nav nav-tabs mb-4 border-secondary">
@@ -25,7 +25,7 @@
     <div class="row">
         {% for coin in wallets %}
         <div class="col-md-4 mb-3">
-            <div class="card p-4 text-center border-secondary bg-dark text-white">
+            <div class="card p-4 text-center shadow-sm">
 
                 <h6 class="text-muted small text-uppercase">
                     {{ coin.coinName }}
@@ -59,7 +59,7 @@
     {% elif view == 'summary' %}
 
         <!-- SUMMARY VIEW -->
-        <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
+        <div class="card p-4 shadow-sm">
             <h5 class="mb-3">Portfolio Summary</h5>
 
             <p><strong>Total Value:</strong> {{ total_value }}</p>
@@ -77,7 +77,7 @@
     {% elif view == 'performance' %}
     
         <!-- PERFORMANCE VIEW -->
-        <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
+        <div class="card p-4 shadow-sm">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="m-0">Portfolio Performance</h5>
                 <span class="badge bg-primary">Transaction History</span>
@@ -88,7 +88,7 @@
                     <canvas id="performanceChart"></canvas>
                 </div>
             {% else %}
-                <div class="text-center py-5 border border-secondary rounded" style="background: rgba(255,255,255,0.02);">
+                <div class="text-center py-5 border rounded opacity-75">
                     <i class="bi bi-graph-up text-muted" style="font-size: 3rem;"></i>
                     <h4 class="mt-3 text-secondary">Not Enough Data</h4>
                     <p class="text-muted">You need at least 2 transactions to generate a performance trend graph.</p>
