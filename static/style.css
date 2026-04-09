@@ -67,3 +67,8 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title, strong, b { color: var(--tex
 
 .nav-link.active { background-color: #3b82f6 !important; color: #ffffff !important; }
 .btn-primary, .badge.bg-success, .badge.bg-danger { color: #ffffff !important; }
+
+/* Force specific headers to always remain black */
+.text-always-black {
+    color: #000000 !important;
+}
