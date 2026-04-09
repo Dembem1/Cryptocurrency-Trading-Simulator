@@ -442,15 +442,34 @@ def admin_dashboard(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        return "User not found!"
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     totalUsers = User.query.count()
+    
+    totalTransactions = Transaction.query.count()
+    
+    totalVolume = db.session.query(db.func.sum(Transaction.total)).scalar() or 0
+
+    most_traded_coins = db.session.query(
+        Transaction.coinName,
+        db.func.count(Transaction.id).label("trade_count")
+    ).group_by(Transaction.coinName).order_by(db.desc("trade_count")).limit(5).all()
+
+    most_traded_coin = most_traded_coins[0].coinName if most_traded_coins else "No data"
 
     return render_template(
         "admin_dashboard.html",
         username=user.username,
         balance=user.balance,
         role=user.role,
+        totalTransactions = totalTransactions,
+        totalVolume = round(totalVolume, 2),
+        most_traded_coin = most_traded_coin,
         totalUsers = totalUsers,
         title="Admin Dashboard"
     )
@@ -463,7 +482,12 @@ def manage_users(username):
     users = User.query.all()
 
     if not user:
-        return "User not found!"
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     if request.method == 'POST':
         user_id = request.form.get('user_id')
@@ -492,6 +516,14 @@ def manage_users(username):
 @app.route("/manage_coins/<username>", methods=["GET", "POST"])
 def manage_coins(username):
     user = User.query.filter_by(username=username).first()
+
+    if not user:
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     if request.method == "POST":
         coin_name = request.form.get("coin_name", "").lower().strip()
@@ -565,7 +597,12 @@ def logs(username):
     user = User.query.filter_by(username=username).first()
 
     if not user:
-        return "User not found!"
+        flash("User not found", "danger")
+        return redirect(url_for("index"))
+
+    if user.role != "admin":
+        flash("Access denied", "danger")
+        return redirect(url_for("index"))
 
     return render_template(
         "logs.html",
