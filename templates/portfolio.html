@@ -8,18 +8,24 @@
     
     <ul class="nav nav-tabs mb-4 border-secondary">
         <li class="nav-item">
-            <a class="nav-link {% if view == 'wallet' %}active{% endif %}" 
-               href="{{ url_for('portfolio', username=username, view='wallet') }}">Wallet</a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link {% if view == 'summary' %}active{% endif %}" 
                href="{{ url_for('portfolio', username=username, view='summary') }}">Summary</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if view == 'wallet' %}active{% endif %}" 
+               href="{{ url_for('portfolio', username=username, view='wallet') }}">Wallet</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if view == 'performance' %}active{% endif %}" 
                href="{{ url_for('portfolio', username=username, view='performance') }}">Performance View</a>
         </li>
     </ul>
+
+    {% if wallets|length == 0 %}
+        <div class="alert alert-info">
+            Your portfolio is empty. Start trading to see your assets here!
+        </div>
+    {% endif %}
 
     {% if view == 'wallet' %}
 
@@ -37,7 +43,7 @@
             </h4>
             
             <form method="POST", action="{{ url_for('portfolio', username=username) }}">
-                <input type="hidden" name="coin_name" value="{{ coin.coinName }}">
+                <input type="hidden" name="coin_name" value="{{ coin.coinName }}">      
 
                 <input type="number" step="0.0001" name="amount" placeholder="Amount" class="form-control mb-2">
 
@@ -53,60 +59,79 @@
 
     {% elif view == 'summary' %}
     <div class="row">
-        <div class="col-md-4">
-            <div class="card p-4 text-center border-secondary bg-dark text-white">
-                <h6 class="text-muted small text-uppercase">Current ROI %</h6>
-                <h2 class="text-success mt-2">+5.80%</h2>
+        <div class="col-md-3">
+            <div class="card p-3 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">Total Invested</h6>
+                <h2 class="text-success mt-2">${{ total_invested }}</h2>
             </div>
         </div>
-    </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">Total Trades</h6>
+                <h2 class="text-info mt-2">{{ total_trades }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">Current Value</h6>
+                <h2 class="text-warning mt-2">${{ current_value }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">Profit/Loss</h6>
+                <h2 class="text-{% if profit >= 0 %}success{% else %}danger{% endif %} mt-2">${{ profit }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">ROI</h6>
+                <h2 class="text-{% if roi >= 0 %}success{% else %}danger{% endif %} mt-2">{{ roi }}%</h2>  
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center border-secondary bg-dark text-white">
+                <h6 class="text-muted small text-uppercase">Total Sold</h6>
+                <h2 class="text-danger mt-2">${{ total_sold }}</h2>
+            </div>
+        </div>
+   </div>
 
     {% elif view == 'performance' %}
     <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="m-0">Profit/Loss Performance</h5>
+            <h5 class="m-0">Portfolio Performance</h5>
             <span class="badge bg-primary">7-Day View</span>
         </div>
         
-        <div style="height: 350px; width: 100%;">
+        <div style="height: 600px; width: 100%;">
             <canvas id="performanceChart"></canvas>
         </div>
     </div>
 
     <script>
-        // Chart.js setup
-        var ctx = document.getElementById('performanceChart').getContext('2d');
-        var myChart = new Chart(ctx, {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+
+        constdata = {
+            labels: [
+                {% for t in transactions %}
+                    "{{ t.timestamp.strftime('%Y-%m-%d') }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Transaction Value',
+                data: [
+                    {% for t in transactions %}
+                        {{ t.total }},
+                    {% endfor %}
+                ]
+            }]
+        };
+
+        new Chart(ctx, {
             type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Portfolio Value ($)',
-                    data: [1000, 1050, 1020, 1100, 1150, 1210, 1250],
-                    borderColor: '#0d6efd', // blue
-                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.2 // for the curved line on chart
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false } // to keep it clean
-                },
-                scales: {
-                    y: { 
-                        grid: { color: '#374151' }, 
-                        ticks: { color: '#9ca3af' } 
-                    },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { color: '#9ca3af' }
-                    }
-                }
-            }
+            data: data
         });
     </script>
     {% endif %}
