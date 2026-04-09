@@ -84,3 +84,24 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title, strong, b { color: var(--tex
 .text-always-black {
     color: #000000 !important;
 }
+
+/* user management status badges  */
+
+.table .badge.bg-success {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 0.5em 0.8em;
+}
+
+.table .badge.bg-danger {
+    background-color: #ef4444 !important; 
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 0.5em 0.8em;
+}
+
+.table .btn-outline-danger {
+    border-width: 2px;
+    font-weight: 600;
+}
