@@ -24,10 +24,22 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Fix for all text and headings */
-p, span, li, label, .form-label, td, th, .text-muted { color: var(--text-main) !important; }
+p, span, li, label, .form-label, .text-muted { color: var(--text-main) !important; }
 h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title, strong, b { color: var(--text-heading) !important; }
 
+/* TABLE ADJUSTMENT (Forced black on white for both themes) */
+.table, .table td, .table th, .table tr, .table span, .table strong { 
+    color: #000000 !important; 
+    background-color: #ffffff !important; 
+}
+
+.table thead th {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+}
+
+/* Layout & Components */
 .sidebar {
     height: 100vh;
     background-color: var(--sidebar-bg) !important;
@@ -54,5 +66,4 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .card-title, strong, b { color: var(--tex
 }
 
 .nav-link.active { background-color: #3b82f6 !important; color: #ffffff !important; }
-
 .btn-primary, .badge.bg-success, .badge.bg-danger { color: #ffffff !important; }
