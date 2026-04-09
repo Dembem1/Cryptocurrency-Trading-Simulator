@@ -22,23 +22,39 @@
     <!-- Conditional rendering -->
     {% if view == 'wallet' %}
 
-        <!-- WALLET VIEW -->
-        <div class="card p-4 border-secondary bg-dark text-white shadow-sm">
-            <h5 class="mb-3">Your Wallet</h5>
+    <div class="row">
+        {% for coin in wallets %}
+        <div class="col-md-4 mb-3">
+            <div class="card p-4 text-center border-secondary bg-dark text-white">
 
-            {% if portfolio %}
-                <ul class="list-group list-group-flush">
-                    {% for asset in portfolio %}
-                        <li class="list-group-item bg-dark text-white d-flex justify-content-between">
-                            <span>{{ asset.name }}</span>
-                            <span>{{ asset.amount }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted">No assets in your wallet yet.</p>
-            {% endif %}
+                <h6 class="text-muted small text-uppercase">
+                    {{ coin.coinName }}
+                </h6>
+
+                <h4 class="mt-2">
+                    {{ coin.balance }}
+                </h4>
+                
+                <form method="POST" action="{{ url_for('portfolio', username=username) }}">
+                    <input type="hidden" name="coin_name" value="{{ coin.coinName }}">
+
+                    <input type="number"
+                        step="0.0001"
+                        name="amount"
+                        placeholder="Amount"
+                        class="form-control mb-2"
+                        required
+                        min="0.0001">
+
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        Sell
+                    </button>
+                </form>
+
+            </div>
         </div>
+        {% endfor %}
+    </div>
 
     {% elif view == 'summary' %}
 
