@@ -58,25 +58,46 @@
 
     {% elif view == 'summary' %}
 
-        <!-- SUMMARY VIEW -->
-        <div class="card p-4 shadow-sm">
-            <h5 class="mb-3">Portfolio Summary</h5>
+<!-- Summary View -->
+<div class="row g-4">
 
-            <p><strong>Total Value:</strong> {{ total_value }}</p>
-            <p><strong>Total Assets:</strong> {{ portfolio|length }}</p>
-
-            {% if portfolio %}
-                <ul>
-                    {% for asset in portfolio %}
-                        <li>{{ asset.name }}: {{ asset.amount }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+    <!-- Left column -->
+    <div class="col-md-6">
+        
+        <div class="card p-4 shadow-sm text-center mb-4">
+            <h6 class="text-muted text-uppercase">Total Invested</h6>
+            <h2 class="mt-2 text-success">$ {{ total_invested }}</h2>
         </div>
+
+        <div class="card p-4 shadow-sm text-center">
+            <h6 class="text-muted text-uppercase">ROI</h6>
+            <h2 class="mt-2 {% if roi >= 0 %}text-success{% else %}text-danger{% endif %}">
+                {{ roi }}%
+            </h2>
+        </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="col-md-6">
+
+        <div class="card p-4 shadow-sm text-center mb-4">
+            <h6 class="text-muted text-uppercase">Total Trades</h6>
+            <h2 class="mt-2 text-success">{{ total_trades }}</h2>
+        </div>
+
+        <div class="card p-4 shadow-sm text-center">
+            <h6 class="text-muted text-uppercase">Total Sold</h6>
+            <h2 class="mt-2 text-danger">$ {{ total_sold }}</h2>
+        </div>
+
+    </div>
+
+</div>
 
     {% elif view == 'performance' %}
     
-        <!-- PERFORMANCE VIEW -->
+        <!-- Performance View -->
         <div class="card p-4 shadow-sm">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="m-0">Portfolio Performance</h5>
