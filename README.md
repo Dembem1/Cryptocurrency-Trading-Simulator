@@ -23,11 +23,10 @@ Backend:
 - RESTful API architecture
 
 Database:
-- MySQL (hosted on AWS)
+- SQLite (via Flask-SQLAlchemy)
 
-Authentication:
-- JSON Web Tokens (JWT)
-- bcrypt password hashing
+Security:
+- Werkzeug (Password Hashing)
 
 External Integration:
 - CoinGecko Public API
@@ -54,5 +53,12 @@ External Integration:
 ## Setup Instructions
 
 1. Clone the repository
+   "git clone https://github.com/Dembem1/Cryptocurrency-Trading-Simulator.git"
 2. Create a virtual environment
 3. Install dependencies:
+   "pip install flask flask-sqlalchemy flask-migrate requests"
+4. Enviroment Configuration
+   Database: Uses SQLite by default (test.db)
+   API: Uses the CoinGecko Public Api (No API key key required for basic usage)
+5. Run the application:
+   "python app.py"
