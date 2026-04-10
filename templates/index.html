@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CryptoSim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100">
+    <div class="card shadow-lg p-4" style="width: 400px; background-color: #1f2937; border: 1px solid #374151;">
+        <div class="card-body text-center">
+          <!-- Logo will go in here
+           <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo"> -->
+          
+            <h2 class="mb-4 text-white">Login</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} py-2 small">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="/login" method="POST">
+                <div class="mb-3 text-start"> <input type="text" name="username" class="form-control" placeholder="Username" required>
+                </div>
+                <div class="mb-3 text-start">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+            
+            <p class="mt-4 text-muted small">
+                Don't have an account? <a href="/register" class="text-info text-decoration-none">Register</a>
+            </p>
+        </div> 
+      </div> 
+</body>
+</html>

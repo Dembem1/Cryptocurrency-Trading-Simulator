@@ -1,0 +1,51 @@
+<div class="card">
+
+    <div class="card-body">
+
+        <table class="table table-striped">
+
+            <thead>
+
+                <tr>
+
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% if rows %}
+
+                    {% for row in rows %}
+
+                    <tr>
+
+                        {% for item in row %}
+                        <td>{{ item }}</td>
+                        {% endfor %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+                        <td colspan="{{ headers|length }}" class="text-center">
+                            {{ empty_message }}
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

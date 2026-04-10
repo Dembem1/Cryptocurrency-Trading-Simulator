@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0">Platform Overview</h4>
+          <span class="text-muted small">Real-time system monitoring</span>
+      </div>
+
+      <div class="row g-4">
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Total Users</h6>
+                  <span><h2 class="fw-bold mb-0">{{ totalUsers }}</h2></span>
+                  <div class="mt-2 small text-success">↑ 4% this week</div>
+              </div>
+          </div>
+
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Total Trading Volume</h6>
+                  <h2 class="fw-bold mb-0">{{ totalVolume }}</h2>
+                  <div class="mt-2 small text-muted">Simulated Activity</div>
+              </div>
+          </div>
+
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Most Traded Coin</h6>
+                  <h2 class="fw-bold text-primary mb-0">{{ most_traded_coin }}</h2>
+                  <div class="mt-2 small text-muted">Based on 24h logs</div>
+              </div>
+          </div>
+
+          <div class="col-md-3">
+              <div class="card shadow-sm border-0 p-3 text-center card-hover">
+                  <h6 class="text-muted mb-2">Total Transactions</h6>
+                  <h2 class="fw-bold mb-0">{{ totalTransactions }}</h2>
+                  <div class="mt-2 small text-info">All system logs</div>
+              </div>
+          </div>
+      </div>
+
+      <div class="row mt-5">
+          <div class="col-md-12">
+              <div class="card p-4 border-0 shadow-sm" style="background-color: rgba(255,255,255,0.03);">
+                  <h5>Administrative Quick Links</h5>
+                  <p class="text-muted">Use the sidebar or the links below to manage the platform.</p>
+                  <div class="d-flex gap-3">
+                      <a href="{{ url_for('manage_users', username=current_user) }}" class="btn btn-outline-primary btn-sm">Review User Status</a>
+                      <a href="{{ url_for('manage_coins', username=current_user) }}" class="btn btn-outline-info btn-sm">Add New Coin</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!-- sidebar section -->
+<!-- users side bar with Dashboard, Portfolio and Transactions-->
+<nav class="sidebar">
+
+    <h4 class="logo">Logo</h4>
+
+    <ul class="nav-list">
+
+        <li>
+            <a href="{{ url_for('dashboard', username=current_user) }}">
+                Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('portfolio', username=current_user) }}">
+                Portfolio
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('transactions', username=username) }}">
+                Transactions
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ url_for('index') }}" class="logout">
+                Logout
+            </a>
+        </li>
+
+    </ul>
+
+</nav>
+
+<!-- topbar section -->
+<nav class="topbar">
+
+    <span class="page_title">
+        {{ title }}
+    </span> <!-- pass a title from a page -->
+
+    <div class="topbar-right">
+
+        <span class="balance">
+            Balance: ${{ balance }}
+        </span>
+
+        <span class="username">
+            {{ current_user }}
+        </span>
+
+    </div>
+
+</nav>
+
+<!-- theme bar & sub-navigation section -->
+ <!-- Theme & Sub-nav -->
+<nav class="topbar-extra d-flex justify-content-between align-items-center p-2 bg-light border-bottom">
+    
+    <!-- sub-navigation (only for portfolio) -->
+    {% if page_category == 'portfolio' %}
+    <div class="sub-nav">
+        <a href="{{ url_for('portfolio', username=username) }}?view=summary" class="btn btn-link">Summary</a>
+        <a href="{{ url_for('portfolio', username=username) }}?view=performance" class="btn btn-link">Performance</a>
+        <a href="{{ url_for('portfolio', username=username) }}?view=holdings" class="btn btn-link">Holdings</a>
+    </div>
+    {% endif %}
+
+    <!-- theme button -->
+    <div class="theme-bar">
+        <button id="themeToggle" class="btn btn-outline-secondary btn-sm">Dark Mode</button>
+    </div>
+</nav>
+

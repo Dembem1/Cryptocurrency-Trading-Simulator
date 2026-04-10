@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                    {% if user.is_banned == True %}
+                        <span class="badge bg-danger">Banned</span>
+                    {% else %}
+                        <span class="badge bg-success">Active</span>
+                    {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_banned == True %}
+                        <form method="post">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button class="btn btn-sm btn-outline-danger" name="action" value="unban">Unban</button>
+                        </form>
+                        {% else %}
+                        <form method="post">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button class="btn btn-sm btn-outline-danger" name="action" value="ban">Ban</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

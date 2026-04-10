@@ -1,0 +1,155 @@
+/* ============================================================
+   THEME VARIABLES
+   ============================================================ */
+:root {
+    --bg-color: #0f172a;
+    --sidebar-bg: #1e293b;
+    --card-bg: #1e293b;
+    --text-main: #cbd5e1;
+    --text-heading: #ffffff;
+    --border-color: #334155;
+    --input-bg: #0f172a;
+}
+
+[data-theme="light"] {
+    --bg-color: #f8f9fa;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text-main: #334155;
+    --text-heading: #0f172a;
+    --border-color: #e2e8f0;
+    --input-bg: #ffffff;
+}
+
+/* ============================================================
+   GLOBAL STYLES
+   ============================================================ */
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-main) !important;
+    transition: all 0.3s ease;
+}
+
+/* Text defaults */
+p, span, li, label, .form-label, .text-muted {
+    color: var(--text-main) !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.navbar-brand,
+.card-title,
+strong,
+b {
+    color: var(--text-heading) !important;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.sidebar {
+    height: 100vh;
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--border-color);
+    position: fixed;
+    width: 250px;
+    z-index: 1000;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+}
+
+.no-sidebar {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+
+.card {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.form-control {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+.nav-link.active {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+.btn-primary,
+.badge.bg-success,
+.badge.bg-danger {
+    color: #ffffff !important;
+}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+
+.table,
+.table td,
+.table th,
+.table tr,
+.table span,
+.table strong {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+.table thead th {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+}
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+
+.form-control::placeholder {
+    color: var(--text-main) !important;
+    opacity: 0.7;
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+
+.text-always-black {
+    color: #000000 !important;
+}
+
+/* ============================================================
+   USER MANAGEMENT BADGES
+   ============================================================ */
+
+.table .badge.bg-success {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 0.5em 0.8em;
+}
+
+.table .badge.bg-danger {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 0.5em 0.8em;
+}
+
+.table .btn-outline-danger {
+    border-width: 2px;
+    font-weight: 600;
+}
