@@ -47,9 +47,9 @@
                   <h5>Administrative Quick Links</h5>
                   <p class="text-muted">Use the sidebar or the links below to manage the platform.</p>
                   <div class="d-flex gap-3">
-                      <a href="{{ url_for('manage_users', username=current_user) }}" class="btn btn-outline-primary btn-sm">Review User Status</a>
-                      <a href="{{ url_for('manage_coins', username=current_user) }}" class="btn btn-outline-info btn-sm">Add New Coin</a>
-                  </div>
+                    <a href="{{ url_for('manage_users', username=username) }}"class="btn btn-outline-primary btn-sm">Review User Status</a>
+                    <a href="{{ url_for('manage_coins', username=username) }}"class="btn btn-outline-info btn-sm"> Add New Coin</a>
+                </div>
               </div>
           </div>
       </div>
